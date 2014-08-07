@@ -12,7 +12,7 @@ class GetAddressRequest extends BillmateRequest
     }
 
     public function getMethod() {
-        return 'get_Address';
+        return 'get_addresses';
     }
 
     public function toArray() {
@@ -22,6 +22,10 @@ class GetAddressRequest extends BillmateRequest
 
             'pno' => $this->pno;
         );
+    }
+
+    protected function parseResult(array $response) {
+        return $response;
     }
 }
 ?>
