@@ -24,9 +24,11 @@
  *      from {@link http://phpxmlrpc.sourceforge.net/}
  *
  */
- class BillMate{
+class BillMate
+{
  	var $SERVER = "0.5.9";
- 	var $CLIENT = "";
+ 	var $CLIENT = "PHP:BillMate:0.5.8";
+
  	var $URL = "api.billmate.se";
  	var $URL_TEST = "apitest.billmate.se";
  	var $STAT  = "stat.billmate.se";
@@ -34,22 +36,27 @@
  	protected $xmlrpc;
  	protected $debugmode;
  	protected $testmode;
- 	function BillMate($eid,$key,$ssl=true,$debug=false,$test=false){
+
+    function BillMate($eid,$key,$ssl=true,$debug=false,$test=false)
+    {
  		$this->encoding = 2;
  		$this->eid = $eid;
  		$this->key = $key;
-                defined('BILLMATE_VERSION') || define('BILLMATE_VERSION',  "PHP:BillMate:0.5.8" );
-		$this->CLIENT = BILLMATE_VERSION;
  		$this->ssl = $ssl;
  		$this->debugmode = $debug;
  		$this->testmode = $test;
- 		if ($this->ssl) $this->port = 443;
- 		else $this->port = 80;
- 		$url = $test?$this->URL_TEST:$this->URL;
- 		$this->xmlrpc = new xmlrpc_client("/",$url,$this->port,$this->ssl?'https':'http');
+
+        /* Compute API endpoint */
+ 		$url = $test ? $this->URL_TEST : $this->URL;
+        $port = $this->ssl ? 443 : 80;
+        $protocol = $ssl ? 'https' : 'http';
+
+ 		$this->xmlrpc = new xmlrpc_client("/", $url, $port, $protocol);
         $this->xmlrpc->request_charset_encoding = 'ISO-8859-1';
  	}
- 	function ActivateRecurringInvoice($no,$articles) {
+
+    function ActivateRecurringInvoice($no,$articles) 
+    {
  		$params = array(
  	       $this->eid,
  	       $no,
@@ -59,7 +66,9 @@
  	   $result = $this->call('activate_recurring_invoice', $params);
  	   return $result;
  	}
- 	function SendEmail($no) {
+
+    function SendEmail($no) 
+    {
  		$params = array(
  	       $this->eid,
  	       $no,
@@ -68,7 +77,9 @@
  	   $result = $this->call('send_email', $params);
  	   return $result;
  	}
- 	function ExportInvoice($no) {
+
+    function ExportInvoice($no) 
+    {
  		$params = array(
  	       $this->eid,
  	       $no,
@@ -77,7 +88,9 @@
  	   $result = $this->call('export_invoice', $params);
  	   return $result;
  	}
- 	function ActivateInvoice($no,$additionalInfo=array("pclass"=>-1,"shipInfo"=>array())) {
+
+    function ActivateInvoice($no,$additionalInfo=array("pclass"=>-1,"shipInfo"=>array())) 
+    {
 		$params = array(
             $this->eid,
             $no,
@@ -88,7 +101,9 @@
         $result = $this->call('activate_invoice', $params);
         return $result;
  	}
- 	function ActivateReservation($reservationno,$pno,$billing,$shipping,$articles,$additionalinfo){
+
+    function ActivateReservation($reservationno,$pno,$billing,$shipping,$articles,$additionalinfo)
+    {
  		$tobehashed = array($this->eid,$pno);
  		
  		foreach ($articles as $article){
@@ -96,11 +111,13 @@
  			$tobehashed[] = $article["qty"];
  		}
  		$tobehashed[] = $this->key;
- 		if(!isset($additionalinfo["flags"])) $additionalinfo["flags"] = 0;
- 		if(!isset($additionalinfo["currency"])) $additionalinfo["currency"] = 0;
- 		if(!isset($additionalinfo["country"])) $additionalinfo["country"] = 209;
- 		if(!isset($additionalinfo["language"])) $additionalinfo["language"] = 138;
- 		if(!isset($additionalinfo["pclass"])) $additionalinfo["pclass"] = -1;
+        if(empty($additionalinfo["flags"])) 
+            $additionalinfo["flags"] = 0;
+
+ 		if(empty($additionalinfo["currency"])) $additionalinfo["currency"] = 0;
+ 		if(empty($additionalinfo["country"])) $additionalinfo["country"] = 209;
+ 		if(empty($additionalinfo["language"])) $additionalinfo["language"] = 138;
+ 		if(empty($additionalinfo["pclass"])) $additionalinfo["pclass"] = -1;
 		$emptyArrayKeys = array("shipInfo","travelInfo","incomeInfo","bankInfo","extraInfo");
 		foreach ($emptyArrayKeys as $key) if(!isset($additionalinfo[$key])) $additionalinfo[$key] = array();
 		
@@ -139,7 +156,9 @@
  		$result = $this->call('activate_reservation', $params);
  		return $result;
  	}
- 	function Update($rno,$billingaddress,$shippingaddress,$articles,$order1,$order2){
+
+    function Update($rno,$billingaddress,$shippingaddress,$articles,$order1,$order2)
+    {
  		$tobehashed = array(
  		    str_replace('.', ':', $this->SERVER),
  		    $this->CLIENT,
@@ -173,7 +192,9 @@
  		$result = $this->call('update', $params);	        
  		return $result;
  	}
- 	function UpdateOrderNo($invno, $orderid){
+    
+    function UpdateOrderNo($invno, $orderid)
+    {
  		$params = array(
  		    $this->eid,
  		    $this->hash(array($invno, $orderid, $this->key)),
@@ -185,19 +206,23 @@
  		
  		return $result;
  	}
- 	function addressDigestPart($address){
+
+    function addressDigestPart($address)
+    {
         if ($address === null) {
             return array();
         }
         $keys = array('careof', 'street', 'zip', 'city', 'country', 'fname', 'lname');
         $digest = array();
         foreach ($keys as $key) {
-            if ($address[$key] != "")
+            if (!empty($address[$key]))
                 $digest[] = $address[$key];
         }
         return $digest;
     }
- 	function AddInvoice($pno,$billing,$shipping,$articles,$additionalinfo){
+
+    function AddInvoice($pno,$billing,$shipping,$articles,$additionalinfo)
+    {
  		$tobehashed = array();
  		foreach ($articles as $article) $tobehashed[] = $article['goods']['title'];
  		$tobehashed[] = $this->key;
@@ -243,7 +268,9 @@
  		$result = $this->call('add_invoice', $params);
  		return $result;
  	}
- 	function AddOrder($pno,$billing,$shipping,$articles,$additionalinfo){
+
+    function AddOrder($pno,$billing,$shipping,$articles,$additionalinfo)
+    {
  		$tobehashed = array();
  		foreach ($articles as $article) $tobehashed[] = $article['goods']['title'];
  		$tobehashed[] = $this->key;
@@ -277,36 +304,79 @@
  		$result = $this->call('add_order', $params);
  		return $result;
  	}
- 	function GetAddress($pno) {
+
+    function GetAddress($pno) 
+    {
  		$type = 5;
- 	    $params = array($pno,$this->eid,$this->hash(array($this->eid, $pno, $this->key)),$this->encoding,$type,$this->IP());
+        $params = array(
+            $pno,
+            $this->eid,
+            $this->hash(array($this->eid, $pno, $this->key)),
+            $this->encoding,
+            $type,
+            $this->IP()
+        );
         $result = $this->call('get_addresses', $params);
         return $result;
     }
-    function CreditCheck($id,$pno,$amount,$email,$phonenumber=""){
-    	$params = array($pno,$this->eid,$this->hash(array($this->eid, $pno,$amount, $this->key)),$amount,$email,$phonenumber,$id,$this->IP());
+
+    function CreditCheck($id, $pno, $amount, $email, $phonenumber="")
+    {
+        $params = array(
+            $pno,
+            $this->eid,
+            $this->hash(array($this->eid, $pno,$amount, $this->key)),
+            $amount,
+            $email,
+            $phonenumber,
+            $id,
+            $this->IP()
+        );
     	$result = $this->call('credit_check', $params);
     	return $result;
     }
-    function FetchCampaigns($additionalinfo = array()) {
-    	$params = array($this->eid,$additionalinfo["currency"],$this->hash(array($this->eid, $additionalinfo["currency"], $this->key)),$additionalinfo["country"],$additionalinfo["language"]);
+
+    function FetchCampaigns($additionalinfo = array()) 
+    {
+        $params = array(
+            $this->eid,
+            $additionalinfo["currency"],
+            $this->hash(array($this->eid, 
+            $additionalinfo["currency"], $this->key)),
+            $additionalinfo["country"],
+            $additionalinfo["language"]
+        );
     	$result = $this->call('get_pclasses', $params);
     	return $result;
     }
-    function CheckOrderStatus($invno,$addinfo=0){
-    	$params = array($this->eid,$this->hash(array($this->eid, $invno, $this->key)),$invno,$addinfo);
+
+    function CheckOrderStatus($invno,$addinfo=0)
+    {
+        $params = array(
+            $this->eid,
+            $this->hash(array($this->eid, $invno, $this->key)),
+            $invno,
+            $addinfo
+        );
     	$result = $this->call('check_order_status', $params);
     	return $result;
     }
-    function CheckInvoiceStatus($invno,$addinfo=0){
-    	$params = array($this->eid,$this->hash(array($this->eid, $invno, $this->key)),$invno,$addinfo);
+
+    function CheckInvoiceStatus($invno,$addinfo=0)
+    {
+        $params = array(
+            $this->eid,
+            $this->hash(array($this->eid, $invno, $this->key)),
+            $invno,
+            $addinfo
+        );
     	$result = $this->call('check_invoice_status', $params);
     	return $result;
     }
-    function hash($args) {
+
+    function hash(array $args) 
+    {
     	$data = implode(":", $args);
-    	
-    	$this->debug("HASHED DATA",$data);
     	
     	$preferred = array(
             'sha512',
@@ -317,53 +387,64 @@
         );
 
         $hashes = array_intersect($preferred, hash_algos());
-
-        
         $hash = array_shift($hashes);
+
     	return base64_encode(pack("H*", hash($hash, $data)));
     }
-    function debug($name,$out) {
-    	if (!$this->debugmode) return;
-    	print "Name:$name Output:\n<br/>";
-    	if(is_array($out) or  is_object($out)) print_r($out);
-    	else print $out;
-    	print "\n<br/>";
+
+    function debug($name,$out) 
+    {
+        if (!$this->debugmode) 
+            return;
+
+    	print "Name: $name Output:<br/>\n";
+        if(is_array($out) || is_object($out)) 
+            print_r($out);
+        else 
+            print $out;
+    	print "<br/>\n";
     }
-    protected function call($method, $array) {
-    	$this->debug($method,$array);
+
+    protected function call($method, $array) 
+    {
+    	$this->debug($method, $array);
+
 		$this->xmlrpc->verifypeer = false;
 		$this->xmlrpc->verifyhost = 0;
+
         $timestart = microtime(true);
 
-        $msg = new xmlrpcmsg($method);
+        $msg = new xmlrpcmsg($method); 
         $params = array_merge(array($this->SERVER, $this->CLIENT), $array);
 
-        $msg = new xmlrpcmsg($method);
-        foreach ($params as $p) $msg->addParam(php_xmlrpc_encode($p, array('extension_api')));
+        foreach ($params as $p) 
+            $msg->addParam(php_xmlrpc_encode($p, array('extension_api')));
             
         if ($this->debugmode) $this->xmlrpc->setDebug(2);
            
         $xmlrpcresp = $this->xmlrpc->send($msg);
-        
+
         $timeend = microtime(true);
-        
         $duration = (int) (($timeend - $timestart) * 1000);
         
         $status = $xmlrpcresp->faultCode();
-        
         if ($status !== 0){
 			$this->stat($method,$array, $xmlrpcresp->faultString(), $duration, $status);
         	return $xmlrpcresp->faultString();
         }
+
         $result = php_xmlrpc_decode($xmlrpcresp->value());
         
+        /* Disable stats? */
         $this->stat($method,$array, $result, $duration, $status);
         
         $this->debug($method, $result);
         return $result;
         
     }
-    public function stat($type,$data, $response, $duration=0, $status=0) {
+
+    public function stat($type,$data, $response, $duration=0, $status=0) 
+    {
         $sock = @fsockopen('udp://'.$this->STAT, 51000, $errno, $errstr, 1500);
 
 		if(!isset($_SESSION["uniqueId"])){
@@ -391,6 +472,7 @@
 			@fclose($sock);
         }
     }
+
     public function stat_post($data_rw,$type='', $response="", $duration=0, $status=0){
         $host = 'api.billmate.se/logs/index.php';
         $server = array('HTTP_USER_AGENT','SERVER_SOFTWARE','DOCUMENT_ROOT','SCRIPT_FILENAME','SERVER_PROTOCOL','REQUEST_METHOD','QUERY_STRING','REQUEST_TIME');
@@ -413,6 +495,7 @@
         $server_output = curl_exec ($ch);
         curl_close ($ch);
     }
+
     function IP()
     {
     	global $REMOTE_ADDR, $HTTP_CLIENT_IP;

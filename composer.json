@@ -1,0 +1,13 @@
+{
+    "name": "Billmate API",
+    "version": "1.0.0",
+    "require": {
+        "phpxmlrpc/phpxmlrpc": "*"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/johanhenriksson/billmate"
+        }
+    ]
+}
