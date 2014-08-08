@@ -1,5 +1,6 @@
 <?php
-namespace billmate;
+namespace billmate\requests;
+use billmate\Billmate;
 
 class GetAddressRequest extends BillmateRequest
 {

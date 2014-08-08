@@ -1,5 +1,6 @@
 <?php
-namespace billmate;
+namespace billmate\requests;
+use billmate\Billmate;
 
 abstract class BillmateRequest
 {
@@ -12,7 +13,6 @@ abstract class BillmateRequest
     }
 
     public abstract function toArray();
-    public abstract function validate();
 
     public function execute() 
     {

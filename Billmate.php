@@ -2,7 +2,10 @@
 namespace billmate;
 use xmlrpc_client;
 
-define('PNO_SWEDEN', 2);
+define('PNO_SWEDEN',  2);
+define('PNO_NORWAY',  3);
+define('PNO_FINLAND', 4);
+define('PNO_DENMARK', 5);
 
 /**
  * Billmate API Implementation

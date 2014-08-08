@@ -1,5 +1,6 @@
 <?php
-namespace billmate;
+namespace billmate\requests;
+use billmate\Billmate;
 
 /**
  * Billmate Card Pay Request
@@ -18,6 +19,7 @@ class CardPayRequest extends BillmateRequest
     protected $order_id;
     protected $amount;
     protected $currency;
+    protected $language;
     protected $payment_method;
     protected $return_method;
     protected $prompt_name_entry;
@@ -28,10 +30,11 @@ class CardPayRequest extends BillmateRequest
     public function __construct(Billmate $api, $order_id, $amount, $currency = 'SEK') 
     {
         $this->order_id = $order_id;
-        $this->amount   = intval($amount);
         $this->currency = $currency;
+        $this->setAmount($amount);
 
         /* Default settings */
+        $this->language            = 'sv';
         $this->return_method       = 'POST';
         $this->payment_method      = static::BOTH;
         $this->prompt_name_entry   = false;
@@ -44,6 +47,16 @@ class CardPayRequest extends BillmateRequest
     public function getPaymentMethod()  { return $this->payment_method; }
     public function getResultRedirect() { return $this->result_redirect; }
     public function getCaptureNow()     { return $this->capture_now; }
+
+    public function setAmount($amount) 
+    {
+        $amount = intval($amount);
+        if ($amount <= 0)
+            throw new \BillmateException("Total amount must be a positive integer (was: {$this->amount})");
+
+        $this->amount = $amount;
+        return $this;
+    }
 
     public function setPaymentMethod($method) 
     {
@@ -64,13 +77,6 @@ class CardPayRequest extends BillmateRequest
     {
         $this->capture_now = boolval($capture_now);
         return $this;
-    }
-
-    protected function validate()
-    {
-        if ($this->amount < 0)
-            throw new \BillmateException("Total amount must be a positive integer (was: {$this->amount})");
-        return true;
     }
 
     public function toArray()
