@@ -1,16 +1,24 @@
 <?php
 namespace billmate;
-
 use xmlrpc_client;
 
 define('PNO_SWEDEN', 2);
 
+/**
+ * Billmate API Implementation
+ *
+ * @author Johan Henriksson
+ * @version 1.0.0
+ */
 class Billmate
 {
     const SERVER   = '0.5.9';
     const CLIENT   = 'PHP:BillMate:0.5.8';
     const URL      = 'api.billmate.se';
     const URL_TEST = 'apitest.billmate.se';
+
+    const YES      = 'YES';
+    const NO       = 'NO';
 
     protected $ssl;
     protected $xmlrpc;
@@ -39,18 +47,16 @@ class Billmate
     public function getEID() { return $this->eid; }
     public function getKey() { return $this->key; }
 
+    public function getCallbackUrl() { return 'http://callback.local'; }
+    public function getAcceptUrl()   { return 'http://accept.local'; }
+    public function getCancelUrl()   { return 'http://cancel.local'; }
+
     protected function createRPC() 
     {
         $this->xmlrpc = new xmlrpc_client("/", $this->url, $this->port, $this->protocol);
         $this->xmlrpc->request_charset_encoding = 'UTF-8';
     }
 
-    protected functin ip() 
-    {
-        global $_SERVER;
-        return $_SERVER['REMOTE_ADDR'];
-    }
-    
     public function call($method, array $array = array())
     {
 		$this->xmlrpc->verifypeer = false;
@@ -76,6 +82,10 @@ class Billmate
         }
 
         return php_xmlrpc_decode($xml_resp->value());
+    }
+
+    public static function boolstr($bool) {
+        return $bool ? static::YES : static::NO;
     }
 }
 ?>

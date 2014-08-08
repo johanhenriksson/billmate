@@ -3,16 +3,16 @@ namespace billmate;
 
 abstract class BillmateRequest
 {
+    const METHOD = 'none';
+
     protected $api;
 
     public function __construct(Billmate $api) {
         $this->api = $api;
     }
 
-    public abstract function getMethod();
     public abstract function toArray();
-
-    protected abstract function parseResult(array $result);
+    public abstract function validate();
 
     public function execute() 
     {
@@ -20,9 +20,13 @@ abstract class BillmateRequest
         return $this->parseResult($response);
     }
 
+    public function getMethod() {
+        return static::METHOD;
+    }
+
     protected function hash(array $args) 
     {
-    	$data = implode(":", $args);
+    	$data = implode(':', $args);
     	
     	$preferred = array(
             'sha512',
@@ -36,6 +40,12 @@ abstract class BillmateRequest
         $hash   = array_shift($hashes);
 
     	return base64_encode(pack("H*", hash($hash, $data)));
+    }
+
+    protected functin ip() 
+    {
+        global $_SERVER;
+        return $_SERVER['REMOTE_ADDR'];
     }
 }
 ?>

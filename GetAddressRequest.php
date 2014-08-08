@@ -3,6 +3,8 @@ namespace billmate;
 
 class GetAddressRequest extends BillmateRequest
 {
+    const METHOD = 'get_addresses';
+
     protected $pno;
 
     public function __construct(Billmate $api, $person_number) 
@@ -11,17 +13,24 @@ class GetAddressRequest extends BillmateRequest
         $this->pno = $person_number;
     }
 
-    public function getMethod() {
-        return 'get_addresses';
+    public function getPersonNumber() {
+        return $this->pno;
     }
 
-    public function toArray() {
+    public function toArray()
+    {
         return array(
             'eid' => $this->api->getEID(),
             'key' => $this->api->getKey(),
-
-            'pno' => $this->pno;
+            'pno' => $this->pno,
         );
+    }
+
+    public function validate() 
+    {
+        if (empty($this->pno))
+            throw new BillmateException("Ogiltigt personnummer");
+        return true;
     }
 
     protected function parseResult(array $response) {
