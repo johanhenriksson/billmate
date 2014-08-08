@@ -1,8 +1,12 @@
 {
     "name": "Billmate API",
     "version": "1.0.0",
+    "config": { 
+        "vendor-dir": "lib/" 
+    }, 
     "require": {
-        "phpxmlrpc/phpxmlrpc": "*"
+        "phpxmlrpc/phpxmlrpc": "*",
+        "phpunit/phpunit":     "*"
     },
     "repositories": [
         {

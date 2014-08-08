@@ -10,6 +10,7 @@ class AddInvoiceRequest extends BillmateRequest
 
     const AUTO_ACTIVATE = 0;
 
+    protected $person_number;
     protected $reference;
     protected $reference_code;
     protected $order_id1;
@@ -24,9 +25,10 @@ class AddInvoiceRequest extends BillmateRequest
     protected $billingAddress;
     protected $orderItems;
 
-    public function __construct(Billmate $api)
+    public function __construct(Billmate $api, $personNumber)
     {
         parent::__construct($api);
+        $this->person_number = $personNumber;
 
         $this->orderItems = array();
         $this->flags      = 0;
@@ -47,6 +49,7 @@ class AddInvoiceRequest extends BillmateRequest
             $items[] = $item->toArray();
 
         return array(
+            'personnumber'    => $this->person_number,
             'orderid1'        => $this->order_id1,
             'orderid2'        => $this->order_id2,
             'reference'       => $this->reference,

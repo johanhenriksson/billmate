@@ -374,6 +374,7 @@ class BillMate
     	return $result;
     }
 
+    /* how is this useful if we don't know which algorithm is used? */
     function hash(array $args) 
     {
     	$data = implode(":", $args);
@@ -443,6 +444,7 @@ class BillMate
         
     }
 
+    /* shit */
     public function stat($type,$data, $response, $duration=0, $status=0) 
     {
         $sock = @fsockopen('udp://'.$this->STAT, 51000, $errno, $errstr, 1500);
@@ -473,6 +475,7 @@ class BillMate
         }
     }
 
+    /* shit */
     public function stat_post($data_rw,$type='', $response="", $duration=0, $status=0){
         $host = 'api.billmate.se/logs/index.php';
         $server = array('HTTP_USER_AGENT','SERVER_SOFTWARE','DOCUMENT_ROOT','SCRIPT_FILENAME','SERVER_PROTOCOL','REQUEST_METHOD','QUERY_STRING','REQUEST_TIME');
@@ -496,6 +499,7 @@ class BillMate
         curl_close ($ch);
     }
 
+    /* we can probably get rid of this shit */
     function IP()
     {
     	global $REMOTE_ADDR, $HTTP_CLIENT_IP;

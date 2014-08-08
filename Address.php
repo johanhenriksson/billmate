@@ -9,6 +9,7 @@ class Address
     protected $zip;
     protected $city;
     protected $country;
+    protected $email;
     protected $telno;
     protected $cellno;
 
@@ -27,6 +28,10 @@ class Address
         $this->country = $country;
     }
 
+    public function getFirstName() { return $this->fname; }
+    public function getLastName()  { return $this->lname; }
+    public function getEmail()     { return $this->email; }
+
     public function toArray()
     {
         return array(
@@ -38,6 +43,7 @@ class Address
             'country' => $this->country,
             'telno'   => $this->telno,
             'cellno'  => $this->cellno,
+            'email'   => $this->email,
 
             'company'         => $this->company,
             'careof'          => $this->careof,
