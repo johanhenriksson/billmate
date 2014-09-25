@@ -31,6 +31,10 @@ class Address
     public function getFirstName() { return $this->fname; }
     public function getLastName()  { return $this->lname; }
     public function getEmail()     { return $this->email; }
+    public function getStreet()    { return $this->street; }
+    public function getCity()      { return $this->city; }
+    public function getZipcode()   { return $this->zipcode; }
+
 
     public function toArray()
     {
